@@ -7,7 +7,7 @@ const clearButton = document.querySelector('#clear-todo-button');
 function addTodoItem(event) {
     const itemText = todoInput.value;
     if (itemText.length > 0) {
-        postData("/add", {
+        postData("http://127.0.0.1:8000/api/add", {
             text: itemText
         }).then(response => displayItems(response));
     }
@@ -24,7 +24,7 @@ async function displayItem(item) {
     deleteButton.textContent = "Delete";
     deleteButton.className = "delete";
     deleteButton.style.marginLeft = "10px";
-    const itemInput = document.createElement("input")
+    const itemInput = document.createElement("input");
     itemInput.value = item.text;
     itemInput.className = "item-input";
     li.appendChild(itemInput);
@@ -43,7 +43,7 @@ async function displayItems(response) {
 }
 
 function clearTodoItems() {
-    postData("/clear", {})
+    postData("http://127.0.0.1:8000/api/clear", {}, action = 'DELETE')
         .then(response => displayItems(response));
 }
 
@@ -52,14 +52,14 @@ function updateOrDelete(e) {
     const idx = Array.from(itemsList.children)
         .indexOf(clickedItem);
     if (e.target.className === "delete") {
-        postData(`/delete/${idx}`, {}, action = 'DELETE')
+        postData(`http://127.0.0.1:8000/api/delete/${idx}`, {}, action = 'DELETE')
             .then(response => displayItems(response));
     } else if (e.target.className === "update") {
         const result = clickedItem.firstChild.value;
         if (result.length > 0) {
-            postData(`/update/${idx}`, {text: result},
-            action = 'PUT')
-            .then(response => displayItems(response));
+            postData(`http://127.0.0.1:8000/api/update/${idx}`, {text: result},
+                action = 'PUT')
+                .then(response => displayItems(response));
         }
 
     }
@@ -83,9 +83,11 @@ async function postData(url, data, action = 'POST') {
     return response.json();
 }
 
-fetch("/list")
+fetch("http://127.0.0.1:8000/api/list")
     .then(response => response.json())
-    .then(response => displayItems(response));
+    .then(response => {
+        displayItems(response)
+    });
 
 formButton.addEventListener('click', addTodoItem);
 clearButton.addEventListener('click', clearTodoItems);
