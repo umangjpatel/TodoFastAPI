@@ -49,11 +49,17 @@ async def clear_todo_items():
 
 @app.delete("/delete/{item_id}", response_class=JSONResponse)
 async def delete_todo_item(item_id: int):
-    todo_items.pop(item_id)
-    return await get_todos(message=f"Item #{item_id + 1} deleted successfully")
+    if item_id in range(0, len(todo_items)):
+        todo_items.pop(item_id)
+        return await get_todos(message=f"Item #{item_id + 1} deleted successfully")
+    else:
+        return JSONResponse(status_code=404, content={"message": "Item not found"})
 
 
 @app.put("/update/{item_id}", response_class=JSONResponse)
 async def update_todo_item(item_id: int, todo_item: TodoItem):
-    todo_items[item_id] = todo_item
-    return await get_todos(message=f"Item #{item_id + 1} updated sucessfully")
+    if item_id in range(0, len(todo_items)) and todo_item is not None:
+        todo_items[item_id] = todo_item
+        return await get_todos(message=f"Item #{item_id + 1} updated successfully")
+    else:
+        return JSONResponse(status_code=404, content={"message": "Item not found"})
