@@ -2,13 +2,13 @@ version: "3.9"
 services:
   api:
     container_name: todo-fastapi-api
-    build: ./app
+    build: api
     ports:
       - "8000:8000"
-  frontend:
-    container_name: todo-fastapi-frontend
+  ui:
+    container_name: todo-fastapi-ui
     depends_on:
       - api
     ports:
       - "8080:80"
-    build: ./server
+    build: ui
