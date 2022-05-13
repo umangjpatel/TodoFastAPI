@@ -17,6 +17,7 @@
     <option name="namespacePackageFolders">
       <list>
         <option value="$MODULE_DIR$/app" />
+        <option value="$MODULE_DIR$/actions-demo" />
       </list>
     </option>
   </component>
