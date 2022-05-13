@@ -4,7 +4,8 @@ jobs:
   test-with-coverage:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Fetch repository
+        uses: actions/checkout@v3
       - name: Setup Python 3.9
         uses: actions/setup-python@v3
         with:
