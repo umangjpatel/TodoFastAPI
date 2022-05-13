@@ -1,14 +1,19 @@
 from fastapi import FastAPI
-from typing import List
+from fastapi.middleware.cors import CORSMiddleware
+from typing import List, Optional
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.requests import Request
-from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 
 app: FastAPI = FastAPI()
-app.mount("/static", StaticFiles(directory="static"), name="static")
-templates = Jinja2Templates(directory="static")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 class TodoItem(BaseModel):
@@ -23,37 +28,37 @@ async def get_todos(message: str):
             "items": todo_items}
 
 
-@app.post("/add", response_class=JSONResponse)
+@app.post("/api/add", response_class=JSONResponse)
 async def add_todo_item(item: TodoItem):
     todo_items.append(item)
     return await get_todos(message="Item added successfully")
 
 
-@app.get("/list", response_class=JSONResponse)
+@app.get("/api/list", response_class=JSONResponse)
 async def get_all_items():
     message: str = "No todo items" if len(todo_items) == 0 else "Items loaded successfully"
     return await get_todos(message=message)
 
 
-@app.get("/", response_class=HTMLResponse)
-async def root(request: Request):
-    return templates.TemplateResponse("index.html",
-                                      {"request": request})
-
-
-@app.post("/clear", response_class=JSONResponse)
+@app.delete("/api/clear", response_class=JSONResponse)
 async def clear_todo_items():
     todo_items.clear()
     return await get_todos(message="Items cleared successfully")
 
 
-@app.delete("/delete/{item_id}", response_class=JSONResponse)
+@app.delete("/api/delete/{item_id}", response_class=JSONResponse)
 async def delete_todo_item(item_id: int):
-    todo_items.pop(item_id)
-    return await get_todos(message=f"Item #{item_id + 1} deleted successfully")
+    if item_id in range(0, len(todo_items)):
+        todo_items.pop(item_id)
+        return await get_todos(message=f"Item #{item_id + 1} deleted successfully")
+    else:
+        return JSONResponse(status_code=404, content={"message": "Item not found"})
 
 
-@app.put("/update/{item_id}", response_class=JSONResponse)
+@app.put("/api/update/{item_id}", response_class=JSONResponse)
 async def update_todo_item(item_id: int, todo_item: TodoItem):
-    todo_items[item_id] = todo_item
-    return await get_todos(message=f"Item #{item_id + 1} updated sucessfully")
+    if item_id in range(0, len(todo_items)) and todo_item is not None:
+        todo_items[item_id] = todo_item
+        return await get_todos(message=f"Item #{item_id + 1} updated successfully")
+    else:
+        return JSONResponse(status_code=404, content={"message": "Item not found"})
