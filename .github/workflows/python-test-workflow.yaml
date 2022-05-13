@@ -1,11 +1,11 @@
 name: python-test-workflow
-on: [push]
+on: [ push ]
 jobs:
   python-testing:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.6", "3.7", "3.8", "3.9", "3.10"]
+        python-version: [ "3.6", "3.7", "3.8", "3.9", "3.10" ]
     steps:
       - uses: action@checkoutv3
       - name: Setup Python ${{ matrix.python-version }}
