@@ -2,6 +2,9 @@ name: testing-with-coverage
 on: [ push ]
 jobs:
   test-with-coverage:
+    strategy:
+      matrix:
+        python-version: ['3.7', '3.8', '3.9']
     runs-on: ubuntu-latest
     steps:
       - name: Fetch repository
@@ -9,7 +12,7 @@ jobs:
       - name: Setup Python 3.9
         uses: actions/setup-python@v3
         with:
-          python-version: '3.9'
+          python-version: ${{ matrix.python-version }}
       - name: Generate Coverage Report
         run: |
           pip install coverage
